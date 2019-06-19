@@ -21,8 +21,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/lib/pq/oid"
-	"github.com/lib/pq/scram"
+	"github.com/frankegoesdown/pq/oid"
+	"github.com/frankegoesdown/pq/scram"
 )
 
 // Common error types

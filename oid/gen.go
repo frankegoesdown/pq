@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"strings"
 
-	_ "github.com/lib/pq"
+	_ "github.com/frankegoesdown/pq"
 )
 
 // OID represent a postgres Object Identifier Type.
@@ -51,6 +51,12 @@ func main() {
 		log.Fatal(err)
 	}
 	oids := make([]*OID, 0)
+	log.Fatal("LALALALALA", rows)
+	log.Fatal("LALALALALA", rows)
+	log.Fatal("LALALALALA", rows)
+	log.Fatal("LALALALALA", rows)
+	log.Fatal("LALALALALA", rows)
+	log.Fatal("LALALALALA", rows)
 	for rows.Next() {
 		var oid OID
 		if err = rows.Scan(&oid.Type, &oid.ID); err != nil {
