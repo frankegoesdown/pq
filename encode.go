@@ -26,6 +26,7 @@ func binaryEncode(parameterStatus *parameterStatus, x interface{}) []byte {
 }
 
 func encode(parameterStatus *parameterStatus, x interface{}, pgtypOid oid.Oid) []byte {
+	panic(&parameterStatus)
 	switch v := x.(type) {
 	case int64:
 		return strconv.AppendInt(nil, v, 10)
