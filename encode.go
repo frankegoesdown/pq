@@ -21,25 +21,24 @@ func binaryEncode(parameterStatus *parameterStatus, x interface{}) []byte {
 	case []byte:
 		return v
 	default:
-		return encode(parameterStatus, x, oid.T_unknown)
+		return encode(parameterStatus, x, oid.ColTypeLongVarChar)
 	}
 }
 
 func encode(parameterStatus *parameterStatus, x interface{}, pgtypOid oid.Oid) []byte {
-	panic(&parameterStatus)
 	switch v := x.(type) {
 	case int64:
 		return strconv.AppendInt(nil, v, 10)
 	case float64:
 		return strconv.AppendFloat(nil, v, 'f', -1, 64)
 	case []byte:
-		if pgtypOid == oid.T_bytea {
+		if pgtypOid == oid.ColTypeBinary {
 			return encodeBytea(parameterStatus.serverVersion, v)
 		}
 
 		return v
 	case string:
-		if pgtypOid == oid.T_bytea {
+		if pgtypOid == oid.ColTypeBinary {
 			return encodeBytea(parameterStatus.serverVersion, []byte(v))
 		}
 
@@ -69,15 +68,11 @@ func decode(parameterStatus *parameterStatus, s []byte, typ oid.Oid, f format) i
 
 func binaryDecode(parameterStatus *parameterStatus, s []byte, typ oid.Oid) interface{} {
 	switch typ {
-	case oid.T_bytea:
+	case oid.ColTypeBinary:
 		return s
-	case oid.T_int8:
+	case oid.ColTypeInt64:
 		return int64(binary.BigEndian.Uint64(s))
-	case oid.T_int4:
-		return int64(int32(binary.BigEndian.Uint32(s)))
-	case oid.T_int2:
-		return int64(int16(binary.BigEndian.Uint16(s)))
-	case oid.T_uuid:
+	case oid.ColTypeUUID:
 		b, err := decodeUUIDBinary(s)
 		if err != nil {
 			panic(err)
@@ -93,31 +88,27 @@ func binaryDecode(parameterStatus *parameterStatus, s []byte, typ oid.Oid) inter
 
 func textDecode(parameterStatus *parameterStatus, s []byte, typ oid.Oid) interface{} {
 	switch typ {
-	case oid.T_char, oid.T_varchar, oid.T_text:
-		return string(s)
-	case oid.T_bytea:
-		b, err := parseBytea(s)
-		if err != nil {
-			errorf("%s", err)
-		}
-		return b
-	case oid.T_timestamptz:
-		return parseTs(parameterStatus.currentLocation, string(s))
-	case oid.T_timestamp, oid.T_date:
-		return parseTs(nil, string(s))
-	case oid.T_time:
-		return mustParse("15:04:05", typ, s)
-	case oid.T_timetz:
-		return mustParse("15:04:05-07", typ, s)
-	case oid.T_bool:
-		return s[0] == 't'
-	case oid.T_int8, oid.T_int4, oid.T_int2:
+	case oid.ColTypeInt64:
 		i, err := strconv.ParseInt(string(s), 10, 64)
 		if err != nil {
 			errorf("%s", err)
 		}
 		return i
-	case oid.T_float4, oid.T_float8:
+	case oid.ColTypeChar, oid.ColTypeVarChar, oid.ColTypeLongVarChar:
+		return string(s)
+	case oid.ColTypeBinary:
+		b, err := parseBytea(s)
+		if err != nil {
+			errorf("%s", err)
+		}
+		return b
+	case oid.ColTypeTimestampTZ:
+		return parseTs(parameterStatus.currentLocation, string(s))
+	case oid.ColTypeTimestamp:
+		return parseTs(nil, string(s))
+	case oid.ColTypeBoolean:
+		return s[0] == 't'
+	case oid.ColTypeFloat64:
 		// We always use 64 bit parsing, regardless of whether the input text is for
 		// a float4 or float8, because clients expect float64s for all float datatypes
 		// and returning a 32-bit parsed float64 produces lossy results.
@@ -199,7 +190,7 @@ func mustParse(f string, typ oid.Oid, s []byte) time.Time {
 	str := string(s)
 
 	// check for a 30-minute-offset timezone
-	if (typ == oid.T_timestamptz || typ == oid.T_timetz) &&
+	if (typ == oid.ColTypeTimestamp || typ == oid.ColTypeTimestampTZ) &&
 		str[len(str)-3] == ':' {
 		f += ":00"
 	}

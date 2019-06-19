@@ -721,15 +721,11 @@ func decideColumnFormats(colTyps []fieldDesc, forceText bool) (colFmts []format,
 		// This is the list of types to use binary mode for when receiving them
 		// through a prepared statement.  If a type appears in this list, it
 		// must also be implemented in binaryDecode in encode.go.
-		case oid.T_bytea:
+		case oid.ColTypeBinary:
 			fallthrough
-		case oid.T_int8:
+		case oid.ColTypeInt64:
 			fallthrough
-		case oid.T_int4:
-			fallthrough
-		case oid.T_int2:
-			fallthrough
-		case oid.T_uuid:
+		case oid.ColTypeUUID:
 			colFmts[i] = formatBinary
 			allText = false
 

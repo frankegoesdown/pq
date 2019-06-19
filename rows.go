@@ -23,19 +23,15 @@ type fieldDesc struct {
 
 func (fd fieldDesc) Type() reflect.Type {
 	switch fd.OID {
-	case oid.T_int8:
+	case oid.ColTypeInt64:
 		return reflect.TypeOf(int64(0))
-	case oid.T_int4:
-		return reflect.TypeOf(int32(0))
-	case oid.T_int2:
-		return reflect.TypeOf(int16(0))
-	case oid.T_varchar, oid.T_text:
+	case oid.ColTypeChar, oid.ColTypeVarChar, oid.ColTypeLongVarChar:
 		return reflect.TypeOf("")
-	case oid.T_bool:
+	case oid.ColTypeBoolean:
 		return reflect.TypeOf(false)
-	case oid.T_date, oid.T_time, oid.T_timetz, oid.T_timestamp, oid.T_timestamptz:
+	case oid.ColTypeTimestampTZ, oid.ColTypeTimestamp:
 		return reflect.TypeOf(time.Time{})
-	case oid.T_bytea:
+	case oid.ColTypeBinary:
 		return reflect.TypeOf([]byte(nil))
 	default:
 		return reflect.TypeOf(new(interface{})).Elem()
@@ -48,9 +44,9 @@ func (fd fieldDesc) Name() string {
 
 func (fd fieldDesc) Length() (length int64, ok bool) {
 	switch fd.OID {
-	case oid.T_text, oid.T_bytea:
+	case oid.ColTypeLongVarChar, oid.ColTypeBinary:
 		return math.MaxInt64, true
-	case oid.T_varchar, oid.T_bpchar:
+	case oid.ColTypeVarChar, oid.ColTypeChar:
 		return int64(fd.Mod - headerSize), true
 	default:
 		return 0, false
@@ -59,7 +55,7 @@ func (fd fieldDesc) Length() (length int64, ok bool) {
 
 func (fd fieldDesc) PrecisionScale() (precision, scale int64, ok bool) {
 	switch fd.OID {
-	case oid.T_numeric, oid.T__numeric:
+	case oid.ColTypeFloat64:
 		mod := fd.Mod - headerSize
 		precision = int64((mod >> 16) & 0xffff)
 		scale = int64(mod & 0xffff)

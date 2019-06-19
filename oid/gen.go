@@ -38,7 +38,7 @@ func main() {
 		os.Setenv("PGSSLMODE", "disable")
 	}
 
-	db, err := sql.Open("postgres", "")
+	db, err := sql.Open("vertica", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,12 +51,6 @@ func main() {
 		log.Fatal(err)
 	}
 	oids := make([]*OID, 0)
-	log.Fatal("LALALALALA", rows)
-	log.Fatal("LALALALALA", rows)
-	log.Fatal("LALALALALA", rows)
-	log.Fatal("LALALALALA", rows)
-	log.Fatal("LALALALALA", rows)
-	log.Fatal("LALALALALA", rows)
 	for rows.Next() {
 		var oid OID
 		if err = rows.Scan(&oid.Type, &oid.ID); err != nil {
