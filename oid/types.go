@@ -3,7 +3,12 @@
 package oid
 
 const (
-	T_bool             Oid = 16
+	//new types
+	T_bool             Oid = 5
+	T__numeric         Oid = 6
+
+
+	//T_bool             Oid = 16
 	T_bytea            Oid = 17
 	T_char             Oid = 18
 	T_name             Oid = 19
@@ -94,7 +99,7 @@ const (
 	T__timestamptz     Oid = 1185
 	T_interval         Oid = 1186
 	T__interval        Oid = 1187
-	T__numeric         Oid = 1231
+	//T__numeric         Oid = 1231
 	T_pg_database      Oid = 1248
 	T__cstring         Oid = 1263
 	T_timetz           Oid = 1266
